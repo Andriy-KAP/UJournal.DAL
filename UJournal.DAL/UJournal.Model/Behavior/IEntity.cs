@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UJournal.Model.Behavior
 {
-    internal interface IEntity
+    public interface IEntity
     {
         public int Id { get; set; }
     }

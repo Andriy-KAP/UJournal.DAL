@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace UJournal.Model.Behavior
 {
-    internal interface IRepository<T> where T : class, IEntity
+    public interface IRepository<T> where T : class, IEntity
     {
         IQueryable<T> Get();
         IQueryable<T> GetWhere(Expression<Func<T, bool>> expression);

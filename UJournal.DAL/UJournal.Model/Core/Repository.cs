@@ -10,7 +10,7 @@ using UJournal.Model.Behavior;
 
 namespace UJournal.Model.Core
 {
-    internal class Repository<T> : IRepository<T> where T : class, IEntity
+    public class Repository<T> : IRepository<T> where T : class, IEntity
     {
         private UJournalContext _context;
         private DbSet<T> _set;
