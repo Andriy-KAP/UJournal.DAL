@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using UJournal.DAL.Behavior;
+using UJournal.DAL.DTO;
 using UJournal.Model.Core;
 using UJournal.Model.Models;
+using UJournal.WEB.ViewModel;
 
 namespace UJournal.DAL.Controllers
 {
@@ -10,17 +14,21 @@ namespace UJournal.DAL.Controllers
     [ApiController]
     public class StudentController : ControllerBase
     {
-        private UJournalContext context;
-        public StudentController(UJournalContext context)
+        private readonly IStudentService studentService;
+        private readonly IMapper mapper;
+        public StudentController(IStudentService _studentService, IMapper _mapper)
         {
-            this.context = context;
+            this.studentService = _studentService;
+            this.mapper = _mapper;
         }
 
         [HttpGet]
-        public IEnumerable<Student> Get()
+        public async Task<IEnumerable<StudentViewModel>> Get()
         {
+            IEnumerable<StudentDTO> students = await this.studentService.Get();
+            IEnumerable<StudentViewModel> result = this.mapper.Map<IEnumerable<StudentViewModel>>(students);
 
-            return this.context.Students.ToList<Student>();
+            return result;
         }
         
     }
