@@ -7,6 +7,11 @@ using UJournal.DAL.Behavior;
 using UJournal.DAL.Service;
 using UJournal.Model.Behavior;
 using UJournal.Model.Models;
+using MediatR;
+using System.Reflection;
+using UJournal.WEB.Util.Mapper;
+using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
 
 namespace UJournal.DAL
 {
@@ -22,7 +27,21 @@ namespace UJournal.DAL
         {
             services.AddScoped<IRepository<Student>, Repository<Student>>();
             services.AddScoped<IStudentService, StudentService>();
-            services.AddAutoMapper(typeof(Startup));
+            
+            services.AddAutoMapper(config =>
+            {
+                config.AddExpressionMapping();
+                config.AddProfile<MapperProfile>();
+            });
+            
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddAuthentication("Bearer")
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = this.Configuration["IdentityServerUrl"];
+                    options.RequireHttpsMetadata = false;
+                    options.ApiName = "UJournalDALResource";
+                });
             services.AddDbContext<UJournalContext>(options =>
             {
                 options.UseSqlServer(this.Configuration.GetConnectionString("UJournal"),
@@ -45,14 +64,14 @@ namespace UJournal.DAL
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseRouting();
+            app.UseAuthorization();
             app.UseEndpoints(endpoint =>
             {
                 endpoint.MapControllers();
             });
-        }
 
-        
+        }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
@@ -6,30 +8,33 @@ using UJournal.DAL.Behavior;
 using UJournal.DAL.DTO;
 using UJournal.Model.Core;
 using UJournal.Model.Models;
+using UJournal.WEB.Features.Student.Query;
 using UJournal.WEB.ViewModel;
 
 namespace UJournal.DAL.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("Api/{controller}")]
+    [Authorize]
     [ApiController]
     public class StudentController : ControllerBase
     {
-        private readonly IStudentService studentService;
-        private readonly IMapper mapper;
-        public StudentController(IStudentService _studentService, IMapper _mapper)
+        private IMediator mediator;
+        public StudentController(IMediator _mediator)
         {
-            this.studentService = _studentService;
-            this.mapper = _mapper;
+            this.mediator = _mediator;
         }
 
         [HttpGet]
         public async Task<IEnumerable<StudentViewModel>> Get()
         {
-            IEnumerable<StudentDTO> students = await this.studentService.Get();
-            IEnumerable<StudentViewModel> result = this.mapper.Map<IEnumerable<StudentViewModel>>(students);
-
-            return result;
+            return await this.mediator.Send(new GetAllStudentQuery());
         }
-        
+
+        [HttpGet]
+        [Route("GetWhere")]
+        public async Task<IEnumerable<StudentViewModel>> GetWhere(int id)
+        {
+            return await this.mediator.Send(new GetWhereStudentQuery { Expression = student =>  student.Id == id});
+        }
     }
 }

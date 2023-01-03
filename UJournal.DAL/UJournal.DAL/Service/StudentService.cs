@@ -35,9 +35,12 @@ namespace UJournal.DAL.Service
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<StudentDTO>> GetWhere(Expression<Func<StudentDTO, bool>> expression)
+        public async Task<IEnumerable<StudentDTO>> GetWhere(Expression<Func<StudentDTO, bool>> expression)
         {
-            throw new NotImplementedException();
+            Expression<Func<Student, bool>> convertedExpression = this.mapper.Map<Expression<Func<Student, bool>>>(expression);
+            IEnumerable<Student> students = await this.repository.GetWhere(convertedExpression).ToListAsync<Student>();
+            IEnumerable<StudentDTO> result = this.mapper.Map<IEnumerable<StudentDTO>>(students);
+            return result;
         }
         public Task Add(StudentDTO student)
         {
